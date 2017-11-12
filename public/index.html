@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="myApp">
+
+<head>
+  <title>Homework 8</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <link rel="stylesheet" type="text/css" href="stylesheets/style.css">
+
+  
+  <!-- Angular Material style sheet -->
+  <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/angular_material/1.1.0/angular-material.min.css">
+
+  <!-- jQuery library -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  <!-- Latest compiled JavaScript -->
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <link href="https://gitcdn.github.io/bootstrap-toggle/2.2.2/css/bootstrap-toggle.min.css" rel="stylesheet">
+  <script src="https://gitcdn.github.io/bootstrap-toggle/2.2.2/js/bootstrap-toggle.min.js"></script>
+  <!-- Highstock -->
+  <script src="https://code.highcharts.com/stock/highstock.js"></script>
+  <script src="https://code.highcharts.com/stock/modules/exporting.js"></script>
+  <!-- Angular Material requires Angular.js Libraries -->
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular.min.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular-animate.min.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular-aria.min.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular-messages.min.js"></script>
+
+  <!-- Angular Material Library -->
+  <script src="https://ajax.googleapis.com/ajax/libs/angular_material/1.1.0/angular-material.min.js"></script>
+
+  <script src="http://code.highcharts.com/modules/exporting.js"></script>
+  <!-- optional -->
+  <script src="http://code.highcharts.com/modules/offline-exporting.js"></script>
+  
+  <!-- Your application bootstrap  -->
+  <script src="angularjs.js"></script>
+
+</head>
+<body id="mainController" ng-controller="mainController as ctrl">
+  <script>
+
+  window.fbAsyncInit = function() {
+    FB.init({
+      appId            : "1613599472033352",
+      autoLogAppEvents : true,
+      xfbml            : true,
+      version          : 'v2.11'
+    });
+    FB.AppEvents.logPageView();
+  };
+
+  (function(d, s, id){
+     var js, fjs = d.getElementsByTagName(s)[0];
+     if (d.getElementById(id)) {return;}
+     js = d.createElement(s); js.id = id;
+     js.src = "https://connect.facebook.net/en_US/sdk.js";
+     fjs.parentNode.insertBefore(js, fjs);
+   }(document, 'script', 'facebook-jssdk'));
+
+  function facebook(){
+    var pic = angular.element(document.getElementById("mainController")).scope().facebook();
+    console.log(pic);
+  }
+</script>
+
+  <!--
+    Your HTML content here
+  -->  
+  <br class="br15px">
+  <div class="container" ng-cloak>
+    <form class="mytable" name="myForm">
+
+      <div class="form-group row">
+        <h3 align="center">Stock Market Search</h3>
+        <div class="col-md-3"><h5>Enter Stock Ticker Symbol:<h class="text-danger">*</h></h5></div>
+        <div class="col-md-6" align="left">
+          <md-autocomplete
+            required
+            id = "autocomplete"
+            ng-class="{red: myForm.autocomplete.$touched && myForm.autocomplete.$invalid}"
+            md-input-name="autocomplete"
+            md-selected-item="ctrl.selectedItem"
+            md-search-text="ctrl.searchText"
+            md-items="item in ctrl.querySearch(ctrl.searchText)"
+            md-item-text="item.value"
+            md-min-length="0"
+            placeholder="eg. AAPL">
+            <md-item-template>
+            <span ng-if="item" md-highlight-text="ctrl.searchText" md-highlight-flags="^i">{{item.display}}</span>
+            </md-item-template>
+          </md-autocomplete>
+          <div ng-messages="myForm.autocomplete.$invalid" ng-if="myForm.autocomplete.$touched">
+            <span style="font-size:14px;margin-left:0 " ng-show="myForm.autocomplete.$touched && myForm.autocomplete.$invalid">Please enter a stock ticker symbol.</span>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <button type="submit" class="btn btn-primary" name="search" ng-click="panelSwitch=true; search(ctrl.selectedItem.value)" ng-disabled="myForm.autocomplete.$invalid"><span class="glyphicon glyphicon-search"></span>Get Quote</button>
+          <button type="button" class="btn btn-default" name="clear" ng-click="clear();myForm.autocomplete.$touched=false"><span class="glyphicon glyphicon-refresh"></span>Clear</button>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <div class="container">
+    <hr align="center">
+  </div>
+
+  <div class="container">
+    <div class="mytable">
+
+      <div class="animate-show-right" ng-hide="panelSwitch">
+        <div class="panel panel-default">
+          <div class="panel-heading row" style="margin:0;padding-bottom: 0">
+            <span class="pull-left"><h4 style="margin-top:0px">Favorite List</h4></span>
+            <span class="pull-right">
+              Automatic Refersh: <input id="autoRefresh" type="checkbox" data-toggle="toggle" style="margin: 0px">
+              <button type="button" class="btn btn-default" name="refersh" ng-click="refresh()"><span class="glyphicon glyphicon-refresh"></span></button>
+              <button ng-click="panelSwitch=true" type="button" class="btn btn-default" name="slide-right" ng-disabled="!symbol"><span class="glyphicon glyphicon-chevron-right"></span></button>
+            </span>
+          </div>
+          <div class="panel-body row">
+            <div class="col-md-1">
+              <label for="sortBy"><h4>Sort by</h4></label>
+            </div>
+            <div class="col-md-3">
+              <div class="form-group">
+                <select name="sortBy" id="sortBy" class="form-control" ng-options="option.name for option in sortBy.options track by option.id" ng-model="sortBy.model">
+                </select>
+              </div>
+            </div>
+            <div class="col-md-1">
+              <label for="order"><h4>Order</h4></label>
+            </div>
+            <div class="col-md-3">
+              <div class="form-group">
+                <select name="order" id="order" class="form-control" ng-options="option.name for option in order.options track by option.id" ng-model="order.model" ng-disabled="sortBy.model.id == 0">
+                </select>
+              </div>
+            </div>
+          </div>
+          <div class="container" style="width:100%; padding:30px">
+            <div class="row">
+              <table class="table table-striped" style="table-layout: fixed;width:100%">
+                <tbody>
+                  <tr style="font-weight: bold">
+                    <td class="col-md-2">Symbol</td>
+                    <td class="col-md-2">Stock price</td>
+                    <td class="col-md-4">Change (Change Percent)</td>
+                    <td class="col-md-3">Volume</td>
+                    <td class="col-md-1"></td>
+                  </tr>
+                  <tr ng-repeat="x in favoriteList | orderBy: sortBy.model.type :order.model.reverse">
+                    <td class="col-md-2"><a href="#" ng-click="clearAndSearch(x.symbol)">{{ x.symbol }}</a></td>
+                    <td class="col-md-2">{{ x.price }}</td>
+                    <td class="col-md-4"><font color={{x[5].color}}>{{x.change}} ({{x.percent}}%)</font><img ng-src={{x.image}} ng-if="x.image !=''" width=17 height=17></td>
+                    <td class="col-md-3">{{x.volume | number: 0}}</td>
+                    <td class="col-md-1">
+                      <button ng-click="removeFavorite(x.symbol)" type="button" class="btn btn-default"><span class="glyphicon glyphicon-trash"></span></button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="animate-show-left" ng-show="panelSwitch">
+        <div class="panel panel-default">
+        <div class="panel-heading row" style="margin:0;padding-bottom: 0">
+          <span class="pull-left">
+            <button ng-click="panelSwitch=false" type="button" class="btn btn-default" name="slide-left"><span class="glyphicon glyphicon-chevron-left"></span></button>
+          </span>
+          <h4 style="margin-top:0px;text-align: center">Stock Details</h4>
+        </div>
+        <div class="panel-body">
+          <ul class="nav nav-pills">
+            <li class={{activeStock}}><a href="#" ng-click="currentStock();">Current Stock</a></li>
+            <li class={{activeChart}}><a href="#" ng-click="historicalChart();"><span class="glyphicon glyphicon-stats"></span> Historical Charts</a></li>
+            <li class={{activeNews}}><a href="#" ng-click="newsFeed();"><span class="glyphicon glyphicon-link"></span> News Feeds</a></li>
+          </ul>
+          <hr>
+          <div class="row" ng-hide="stockSwitch">
+            <div class="col-md-6">
+              <div class="container" style="width:100%">
+                <span class="pull-left" style="font-weight: bold">Stock Details
+                </span>
+                <span class="pull-right">
+                  <button type="button" class="btn btn-default" name="favorite" ng-disabled="tableDataSwitch" ng-click="favorite()"><span class="glyphicon glyphicon-star-empty" id="star"></span></button>
+                  <button type="button" class="btn btn-default" name="facebook" ng-disabled="graphDataSwitch" ng-click="facebook()"><span><img src="http://cs-server.usc.edu:45678/hw/hw8/images/facebook.png" width=20 height=20></span></button>
+                </span>
+              </div>
+
+              <br class="br15px">
+
+              <div clss="tableContainer" ng-hide="tableDataSwitch">
+                <table class="table table-striped">
+                  <tbody>
+                    <tr ng-repeat="x in stockTable">
+                      <td style="font-weight: bold">{{ x.Key }}</td>
+                      <td><font color={{x.Color}}>{{ x.Key == "Volume" ? (x.Value | number: 0) : x.Value }}</font><img ng-src={{x.Image}} ng-if="x.Image !=''" width=17 height=17></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <br class="br15px">
+              <div class="progress" style="margin-top:30px" ng-hide="tableProgressSwitch">
+                <div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" style="width:50%">
+                </div>
+              </div>
+              <div class="alert alert-danger" ng-hide="tableErrorSwitch">
+                Error! Failed to get current stock data.
+              </div>
+            </div>
+            <div class="col-md-6">
+              <ul class="nav nav-tabs">
+                <li ng-class="{'active':active =='Price'}" ng-init="active='Price'"><a ng-click="price()">Price</a></li>
+                <li ng-class="{'active':active =='SMA'}"><a ng-click="sma()">SMA</a></li>
+                <li ng-class="{'active':active =='EMA'}"><a ng-click="ema()">EMA</a></li>
+                <li ng-class="{'active':active =='STOCH'}"><a ng-click="stoch()">STOCH</a></li>
+                <li ng-class="{'active':active =='RSI'}"><a ng-click="rsi()">RSI</a></li>
+                <li ng-class="{'active':active =='ADX'}"><a ng-click="adx()">ADX</a></li>
+                <li ng-class="{'active':active =='CCI'}"><a ng-click="cci()">CCI</a></li>
+                <li ng-class="{'active':active =='BBANDS'}"><a ng-click="bbands()">BBANDS</a></li>
+                <li ng-class="{'active':active =='MACD'}"><a ng-click="macd()">MACD</a></li>
+              </ul>
+              <div id="chartContainer" ng-hide="graphDataSwitch">
+              </div>
+              <div class="progress" style="margin-top:30px" ng-hide="graphProgressSwitch">
+                <div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" style="width:50%">
+                </div>
+              </div>
+              <div class="alert alert-danger" ng-hide="graphErrorSwitch">
+                Error! Failed to get current {{graphError}} data.
+              </div>
+            </div>
+          </div>
+          <div ng-hide="chartSwitch">
+            <div id="historical-chart-container" class="container" style="width:100%" ng-hide="chartsDataSwitch">
+            </div>
+            <div class="progress" style="margin-top:30px" ng-hide="chartsProgressSwitch">
+              <div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" style="width:50%">
+              </div>
+            </div>
+            <div class="alert alert-danger" ng-hide="chartsErrorSwitch">
+                Error! Failed to get historical charts data.
+            </div>
+          </div>
+          <div ng-hide="newsSwitch">
+            <div ng-hide="newsDataSwitch">
+              <table width="100%">
+                <tbody>
+                  <tr ng-repeat="x in newsTable">
+                    <td>
+                      <div class="well well-sm">
+                        <a target='_blank' href="{{x.link}}"><h4>{{ x.title }}</h4></a>
+                        <h5>Author: {{x.author}}</h5>
+                        <h5>Date: {{x.pubDate}}</h5>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="progress" style="margin-top:30px" ng-hide="newsProgressSwitch">
+              <div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" style="width:50%">
+              </div>
+            </div>
+            <div class="alert alert-danger" ng-hide="newsErrorSwitch">
+                Error! Failed to get news feed data.
+            </div>
+          </div>
+        </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+
+  
+ 
+  
+</body>
+</html>
