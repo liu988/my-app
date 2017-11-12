@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "node ./bin/www"
+    "start": "node app.js"
   },
   "dependencies": {
     "@angular/animations": "^4.4.6",
@@ -12,11 +12,26 @@
     "body-parser": "~1.18.2",
     "cookie-parser": "~1.4.3",
     "debug": "~2.6.9",
-    "express": "~4.15.5",
+    "express": "^4.16.2",
     "jade": "~1.11.0",
     "moment-timezone": "^0.5.14",
     "morgan": "~1.9.0",
+    "request": "^2.83.0",
     "serve-favicon": "~2.4.5",
     "xml2js": "^0.4.19"
-  }
+  },
+  "main": "app.js",
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/liu988/my-app.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/liu988/my-app/issues"
+  },
+  "homepage": "https://github.com/liu988/my-app#readme",
+  "description": ""
 }

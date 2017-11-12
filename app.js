@@ -2,9 +2,8 @@ var express = require('express');
 var path = require('path');
 var index = require('./routes/index');
 var users = require('./routes/users');
-var parseString = require('xml2js').parseString;
 var app = express();
-var port = process.env.PORT || 8080; 				// set the port
+var port = process.env.PORT || 3000; 				// set the port
 var https = require('https');
 var request = require('request');
 var xml2js = require('xml2js');
@@ -14,38 +13,6 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', index);
 app.use('/users', users);
-
-
-app.get('/get', function(req, res) {
-    var username = req.query.symbol;
-    var url = "https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=";
-    url += username;
-    url += "&outputsize=full&&apikey=GCQW3YNQ6PC5VI33";
-    var data = '';
-    var request = require('request');
-    request({
-      url: url,
-      json: true
-    }, function (error, response, body) {
-      if (!error && response.statusCode === 200) {
-        res.json(body);
-      }
-    });
-});
-app.get('/get3', function(req, res) {
-    var url = req.query.url;
-    console.log(url);
-    var data = '';
-    var request = require('request');
-    request({
-      url: url,
-      json: true
-    }, function (error, response, body) {
-      if (!error && response.statusCode === 200) {
-        res.json(body);
-      }
-    });
-});
 
 var urls = [];
 var url1 = "https://www.alphavantage.co/query?function=";
@@ -87,7 +54,6 @@ app.get('/json', function(req, res) {
 
 app.get('/markit',function(req,res){
   var url = "http://dev.markitondemand.com/MODApis/Api/v2/Lookup/json?input="+req.query.symbol;
-  var response_data = '';
   request({
     url: url,
     json: true
