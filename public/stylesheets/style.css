@@ -1,0 +1,93 @@
+html {
+	background-image: url("http://cs-server.usc.edu:45678/hw/hw8/images/background.png")
+}
+body {
+	background-image: url("http://cs-server.usc.edu:45678/hw/hw8/images/background.png")
+}
+.mydiv{
+	margin: 0 auto;
+	width: 80%;
+}
+.mytable{
+	margin: 0 auto;
+	border: 1px;
+	padding: 20px 20px 40px 20px;
+	border-style: solid;
+	border-radius:6px;
+	background-color: white;
+}
+
+.br15px{
+	height: 15px
+}
+
+.red{
+	outline : solid 2px red;
+}
+
+#input-0:focus{
+	border: solid 1px;
+	border-color: #66afe9;
+    outline: 0;
+    -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075), 0 0 8px rgba(102,175,233,.6);
+    box-shadow: inset 0 1px 1px rgba(0,0,0,.075), 0 0 8px rgba(102,175,233,.6);
+}
+#input-0.ng-invalid.ng-touched{
+    border:none;
+    box-shadow:none;
+}
+
+md-autocomplete md-autocomplete-wrap md-progress-linear{
+	display:none;
+}
+
+md-autocomplete md-autocomplete-wrap button{
+	display:none;
+}
+
+@keyframes out {
+  from {
+      opacity: 1;
+  } to {
+      opacity: 0;
+  }
+}
+@keyframes leftIn {
+  from {
+      left:-100%;
+  } to {
+      left:0;
+  }
+}
+@keyframes rightIn {
+  from {
+      right:-100%;
+
+  } to {
+      right:0;
+  }
+}
+
+.animate-show-left {
+  position:relative;
+  background:white;
+  overflow: hidden;
+}
+
+.animate-show-right {
+  position:relative;
+  background:white;
+  overflow: hidden;
+}
+
+.animate-show-left.ng-hide-remove{
+  animation: 0.5s leftIn linear;
+}
+
+.ng-hide-add{ 
+  animation:0 Out; 
+}
+
+.animate-show-right.ng-hide-remove{
+  animation: 0.5s rightIn linear;
+}
